@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "dungeonhotbar",
+	"version": "${version}",
+	"name": "DungeonHotbar",
+    "description": "A Fabric mod that replaces the default hotbar with a redesigned one inspired by Minecraft Dungeons.",
+	"authors": [
+		"RedGast4"
+	],
+    "contact": {
+      "homepage": "https://modrinth.com/mod/dungeon-hotbar",
+      "sources": "https://github.com/RedGast4/dungeon-hotbar",
+      "issues": "https://github.com/RedGast4/dungeon-hotbar/issues"
+    },
+	"license": "MIT",
+	"icon": "assets/dungeonhotbar/textures/icon.png",
+    "environment": "client",
+    "entrypoints": {
+    "client": [
+      "com.dungeonhotbar.client.DungeonHotbarClient"
+     ]
+    },
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+    "suggests": {
+      "modmenu": "*"
+   },
+    "custom": {
+      "modmenu:parent": "hud",
+      "modmenu:clientsideOnly": true,
+      "credits": "Textures by DartCat25 (MIT License)"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "src_alpha",
+    "dstrgb": "one_minus_src_alpha"
+  },
+  "depth_test": "always",
+  "cull": false,
+  "shader": {
+    "type": "position_tex",
+    "source": "minecraft:shaders/core/position_tex.json"
+  },
+  "texture": "dungeonhotbar:textures/gui/mask.png",
+  "write_mask_state": "color"
+}

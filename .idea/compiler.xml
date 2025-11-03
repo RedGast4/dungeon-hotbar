@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="21" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-AoutRefMapFile=F:\projects\customguitextures\build\classes\java\client\client-dungeonhotbar-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=F:\projects\customguitextures\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2.client.tiny -AinMapFileNamedIntermediary=C:\Users\kolba\.gradle\caches\fabric-loom\1.21.10\net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2\mappings.tiny" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="customguitextures.main" options="-AoutRefMapFile=F:\projects\customguitextures\build\classes\java\main\dungeonhotbar-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=F:\projects\customguitextures\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2.main.tiny -AinMapFileNamedIntermediary=C:\Users\kolba\.gradle\caches\fabric-loom\1.21.10\net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2\mappings.tiny" />
+      <module name="customguitextures.test" options="-AoutRefMapFile=F:\projects\customguitextures\build\classes\java\test\test-dungeonhotbar-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=F:\projects\customguitextures\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2.test.tiny -AinMapFileNamedIntermediary=C:\Users\kolba\.gradle\caches\fabric-loom\1.21.10\net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2\mappings.tiny" />
+      <module name="customhud.test" options="-AoutRefMapFile=F:\projects\customguitextures\build\classes\java\test\test-customhud-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=F:\projects\customguitextures\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2.test.tiny -AinMapFileNamedIntermediary=C:\Users\kolba\.gradle\caches\fabric-loom\1.21.10\net.fabricmc.yarn.1_21_10.1.21.10+build.2-v2\mappings.tiny" />
+    </option>
+  </component>
+</project>
