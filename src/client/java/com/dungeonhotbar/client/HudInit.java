@@ -2,29 +2,28 @@ package com.dungeonhotbar.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
-import net.minecraft.util.Identifier;
 
 public class HudInit {
+    private static final net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement EMPTY_ELEMENT =
+            (context, tickCounter) -> {
+                // Intentionally empty: keeps vanilla element registered, but hidden.
+            };
+
     public static void register() {
-        // 1️⃣ Убираем ванильный хотбар
-        HudElementRegistry.removeElement(VanillaHudElements.HOTBAR);
-        HudElementRegistry.removeElement(VanillaHudElements.HEALTH_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.INFO_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.MOUNT_HEALTH);
-        HudElementRegistry.removeElement(VanillaHudElements.EXPERIENCE_LEVEL);
-        HudElementRegistry.removeElement(VanillaHudElements.ARMOR_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.FOOD_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.AIR_BAR);
+        // Не удаляем ванильные элементы, а подменяем их на пустой рендер.
+        // Это важно для 1.21.11, где статус-бары ожидают зарегистрированные элементы.
+        HudElementRegistry.replaceElement(VanillaHudElements.HEALTH_BAR, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.ARMOR_BAR, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.INFO_BAR, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.AIR_BAR, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.MOUNT_HEALTH, EMPTY_ELEMENT);
+        HudElementRegistry.replaceElement(VanillaHudElements.EXPERIENCE_LEVEL, EMPTY_ELEMENT);
 
-        // 2️⃣ Регистрируем наш кастомный хотбар
-        HudElementRegistry.attachElementAfter(
+        // Подменяем ванильный хотбар на кастомный.
+        HudElementRegistry.replaceElement(
                 VanillaHudElements.HOTBAR,
-                Identifier.of("dungeon_hotbar"),
-                (context, tickCounter) -> {
-                    tickCounter.getFixedDeltaTicks();
-                    CustomHotbarRenderer.render(context);
-
-                }
+                (context, tickCounter) -> CustomHotbarRenderer.render(context)
         );
     }
 }
