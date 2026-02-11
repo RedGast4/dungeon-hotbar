@@ -1,30 +1,34 @@
 package com.dungeonhotbar.client;
 
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.util.Identifier;
 
 public class HudInit {
+    private static final HudElement EMPTY_ELEMENT =
+            (context, tickCounter) -> {
+                // Keep element registered but render nothing.
+            };
+
+    private static void hide(Identifier elementId) {
+        HudElementRegistry.replaceElement(elementId, previous -> EMPTY_ELEMENT);
+    }
+
     public static void register() {
-        // 1️⃣ Убираем ванильный хотбар
-        HudElementRegistry.removeElement(VanillaHudElements.HOTBAR);
-        HudElementRegistry.removeElement(VanillaHudElements.HEALTH_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.INFO_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.MOUNT_HEALTH);
-        HudElementRegistry.removeElement(VanillaHudElements.EXPERIENCE_LEVEL);
-        HudElementRegistry.removeElement(VanillaHudElements.ARMOR_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.FOOD_BAR);
-        HudElementRegistry.removeElement(VanillaHudElements.AIR_BAR);
+        // Для 1.21.11 нельзя удалять эти элементы: Fabric ожидает, что они останутся зарегистрированы.
+        hide(VanillaHudElements.HEALTH_BAR);
+        hide(VanillaHudElements.ARMOR_BAR);
+        hide(VanillaHudElements.INFO_BAR);
+        hide(VanillaHudElements.FOOD_BAR);
+        hide(VanillaHudElements.AIR_BAR);
+        hide(VanillaHudElements.MOUNT_HEALTH);
+        hide(VanillaHudElements.EXPERIENCE_LEVEL);
 
-        // 2️⃣ Регистрируем наш кастомный хотбар
-        HudElementRegistry.attachElementAfter(
+        // Подменяем ванильный хотбар на кастомный рендерер.
+        HudElementRegistry.replaceElement(
                 VanillaHudElements.HOTBAR,
-                Identifier.of("dungeon_hotbar"),
-                (context, tickCounter) -> {
-                    tickCounter.getFixedDeltaTicks();
-                    CustomHotbarRenderer.render(context);
-
-                }
+                previous -> (context, tickCounter) -> CustomHotbarRenderer.render(context)
         );
     }
 }
