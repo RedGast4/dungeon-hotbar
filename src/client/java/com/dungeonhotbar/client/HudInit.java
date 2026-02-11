@@ -1,29 +1,34 @@
 package com.dungeonhotbar.client;
 
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.util.Identifier;
 
 public class HudInit {
-    private static final net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement EMPTY_ELEMENT =
+    private static final HudElement EMPTY_ELEMENT =
             (context, tickCounter) -> {
-                // Intentionally empty: keeps vanilla element registered, but hidden.
+                // Keep element registered but render nothing.
             };
 
-    public static void register() {
-        // Не удаляем ванильные элементы, а подменяем их на пустой рендер.
-        // Это важно для 1.21.11, где статус-бары ожидают зарегистрированные элементы.
-        HudElementRegistry.replaceElement(VanillaHudElements.HEALTH_BAR, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.ARMOR_BAR, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.INFO_BAR, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.AIR_BAR, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.MOUNT_HEALTH, EMPTY_ELEMENT);
-        HudElementRegistry.replaceElement(VanillaHudElements.EXPERIENCE_LEVEL, EMPTY_ELEMENT);
+    private static void hide(Identifier elementId) {
+        HudElementRegistry.replaceElement(elementId, previous -> EMPTY_ELEMENT);
+    }
 
-        // Подменяем ванильный хотбар на кастомный.
+    public static void register() {
+        // Для 1.21.11 нельзя удалять эти элементы: Fabric ожидает, что они останутся зарегистрированы.
+        hide(VanillaHudElements.HEALTH_BAR);
+        hide(VanillaHudElements.ARMOR_BAR);
+        hide(VanillaHudElements.INFO_BAR);
+        hide(VanillaHudElements.FOOD_BAR);
+        hide(VanillaHudElements.AIR_BAR);
+        hide(VanillaHudElements.MOUNT_HEALTH);
+        hide(VanillaHudElements.EXPERIENCE_LEVEL);
+
+        // Подменяем ванильный хотбар на кастомный рендерер.
         HudElementRegistry.replaceElement(
                 VanillaHudElements.HOTBAR,
-                (context, tickCounter) -> CustomHotbarRenderer.render(context)
+                previous -> (context, tickCounter) -> CustomHotbarRenderer.render(context)
         );
     }
 }
