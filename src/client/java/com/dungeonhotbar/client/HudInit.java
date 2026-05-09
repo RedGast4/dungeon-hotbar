@@ -3,7 +3,8 @@ package com.dungeonhotbar.client;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+
 
 public class HudInit {
     private static final HudElement EMPTY_ELEMENT =
@@ -24,6 +25,8 @@ public class HudInit {
         hide(VanillaHudElements.AIR_BAR);
         hide(VanillaHudElements.MOUNT_HEALTH);
         hide(VanillaHudElements.EXPERIENCE_LEVEL);
+        hide(VanillaHudElements.HELD_ITEM_TOOLTIP);
+
 
         // Подменяем ванильный хотбар на кастомный рендерер.
         HudElementRegistry.replaceElement(

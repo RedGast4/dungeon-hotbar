@@ -7,19 +7,19 @@ import net.minecraft.world.entity.player.Player;
 
 import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
 
-public class StatusTextRenderer {
+public class StatusTextScale3 {
 
-    private static final int PLAYER_TEXT_OFFSET_X = 85;
-    private static final int PLAYER_TEXT_OFFSET_Y = 2;
-    private static final int MOUNT_TEXT_OFFSET_X  = 95;
-    private static final int MOUNT_TEXT_OFFSET_Y  = 16;
-    private static final int ARMOR_TEXT_OFFSET_X  = 75;
-    private static final int ARMOR_TEXT_OFFSET_Y  = 16;
-    private static final int FOOD_TEXT_OFFSET_X   = 95;
-    private static final int FOOD_TEXT_OFFSET_Y   = 16;
+    private static final int PLAYER_TEXT_OFFSET_X = 170;
+    private static final int PLAYER_TEXT_OFFSET_Y = 4;
+    private static final int MOUNT_TEXT_OFFSET_X  = 190;
+    private static final int MOUNT_TEXT_OFFSET_Y  = 32;
+    private static final int ARMOR_TEXT_OFFSET_X  = 150;
+    private static final int ARMOR_TEXT_OFFSET_Y  = 32;
+    private static final int FOOD_TEXT_OFFSET_X   = 190;
+    private static final int FOOD_TEXT_OFFSET_Y   = 32;
 
     private static final float SMOOTHING = 0.1f;
-    private static final float TEXT_SCALE = 0.4f;
+    private static final float TEXT_SCALE = 0.8f;
 
     private static float displayPlayerHp = 20;
     private static float displayMountHp = 0;
@@ -37,8 +37,8 @@ public class StatusTextRenderer {
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
         int centerX = screenWidth / 2;
-        int bottomY = screenHeight - 24;
-        int hotbarLeft = centerX - 91;
+        int bottomY = screenHeight - 48;
+        int hotbarLeft = centerX - 182;
 
         if (showPlayerHp) {
             float playerCur = player.getHealth() + player.getAbsorptionAmount();

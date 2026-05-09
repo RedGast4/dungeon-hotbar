@@ -10,7 +10,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-public class CustomHotbarRenderer {
+import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
+
+public class HotbarScale3 {
 
     private static final Identifier WIDGETS = Identifier.fromNamespaceAndPath("dungeonhotbar", "textures/gui/widgets.png");
     private static final Identifier FRAME = Identifier.fromNamespaceAndPath("dungeonhotbar", "textures/gui/icons.png");
@@ -19,16 +21,6 @@ public class CustomHotbarRenderer {
     private static float displayHealth = 20f;
 
     public static void render(GuiGraphicsExtractor graphics) {
-        int scale = ScaleDetector.getGuiScale();
-
-        switch (scale) {
-            case 1 -> { HotbarScale1.render(graphics); return; }
-            case 2 -> { HotbarScale2.render(graphics); return; }
-            case 3 -> { HotbarScale3.render(graphics); return; }
-            case 4 -> { HotbarScale4.render(graphics); return; }
-            default -> { /* auto */ }
-        }
-
         Minecraft client = Minecraft.getInstance();
         if (client.player == null) return;
         LocalPlayer player = client.player;
@@ -36,7 +28,7 @@ public class CustomHotbarRenderer {
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
         int centerX = screenWidth / 2;
-        int bottomY = screenHeight - 24;
+        int bottomY = screenHeight - 48;
 
         Inventory inv = player.getInventory();
 
@@ -44,9 +36,9 @@ public class CustomHotbarRenderer {
         displayHealth += (currentHealth - displayHealth) * 0.1f;
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, WIDGETS,
-                centerX - 91, bottomY,
+                centerX - 182, bottomY,
                 200, 46,
-                182, 22,
+                364, 44,
                 1636, 210,
                 1836, 256
         );
@@ -87,39 +79,44 @@ public class CustomHotbarRenderer {
             renderHeart(graphics, centerX, bottomY, client);
         }
 
-        renderItemName(graphics, client, centerX - 14, bottomY - 9, 28);
+        renderItemName(graphics, client, centerX - 28, bottomY - 18, 56);
 
-        StatusTextRenderer.render(graphics, showPlayerHp, showMountHp, showArmor, snowFood);
+        StatusTextScale3.render(graphics, showPlayerHp, showMountHp, showArmor, snowFood);
 
-        int[] offsetX = {2, 2, 2, 2, 2, 2, 2, 2, 2};
-        int[] offsetY = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+        int[] offsetX = {4, 4, 4, 4, 4, 4, 4, 4, 4};
+        int[] offsetY = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         renderHotbarItems(graphics, centerX, bottomY, offsetX, offsetY, inv);
 
         renderSelectedSlot(graphics, centerX, bottomY, inv);
 
         renderVanillaOffHand(graphics, centerX, bottomY, client);
-        BarsRenderer.render(graphics, showWaterBar, LvLBar);
+        BarsScale3.render(graphics, showWaterBar, LvLBar);
     }
 
     private static void renderHeart(GuiGraphicsExtractor graphics, int centerX, int bottomY, Minecraft client) {
         if (client.player == null) return;
+
         float currentHealth = client.player.getHealth() + client.player.getAbsorptionAmount();
         float maxHealth = client.player.getMaxHealth() + client.player.getAbsorptionAmount();
         int tint = getHeartTintSurvival(client);
-        int baseY = bottomY - 7;
+
+        int heartWidth = 48;
+        int heartHeight = 48;
         int totalSlots = 24;
         float hpPerSlot = maxHealth / totalSlots;
         int lostSlots = totalSlots - (int) Math.ceil(currentHealth / hpPerSlot);
-        int heartX = centerX - 12;
-        int heartY = baseY;
-        int heartWidth = 24;
-        int heartHeight = 24;
-        int visibleHeight = heartHeight - lostSlots;
+        float pixelsPerSlot = heartHeight / (float) totalSlots;
+        int visibleHeight = heartHeight - Math.round(lostSlots * pixelsPerSlot);
+
+        int frameX = centerX - 28;
+        int frameY = bottomY - 18;
+        int heartX = centerX - 24;
+        int heartY = frameY + 4;
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, FRAME,
-                centerX - 14, bottomY - 9,
+                frameX, frameY,
                 0, 234,
-                28, 28,
+                56, 56,
                 310, 271,
                 512, 512
         );
@@ -152,47 +149,44 @@ public class CustomHotbarRenderer {
         return hexToArgb("#ff1313");
     }
 
-    static int hexToArgb(String hex) {
-        int rgb = Integer.parseInt(hex.substring(1), 16);
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
-    }
-
     private static void renderHotbarItems(GuiGraphicsExtractor graphics, int centerX, int bottomY,
                                           int[] offsetX, int[] offsetY, Inventory inv) {
         Minecraft client = Minecraft.getInstance();
         int[] slotPositionsX = getSlotPositionsX(centerX);
-        int slotY = bottomY + 3;
-        float slotSize = 10f;
+        int slotY = bottomY + 6;
+
+        float slotSize = 20f;
         float defaultItemSize = 16f;
         float itemScale = slotSize / defaultItemSize;
 
         for (int i = 0; i < 9; i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
+
             int x = slotPositionsX[i] + offsetX[i];
             int y = slotY + offsetY[i];
 
             graphics.pose().pushMatrix();
             graphics.pose().translate(x, y);
             graphics.pose().scale(itemScale, itemScale);
+
             graphics.fakeItem(stack, 0, 0);
             graphics.itemDecorations(client.font, stack, 0, 0);
 
             if (stack.getCount() > 1) {
                 String countText = String.valueOf(stack.getCount());
                 graphics.text(client.font, countText,
-                        x + 12 - client.font.width(countText), y + 9,
+                        x + 24 - client.font.width(countText), y + 18,
                         0xFFFFFFFF, true);
             }
+
             if (stack.isDamaged()) {
                 float damage = (float) stack.getDamageValue() / (float) stack.getMaxDamage();
-                int barWidth = Math.round(13.0F - damage * 13.0F);
+                int barWidth = Math.round(26.0F - damage * 26.0F);
                 int barColor = stack.getBarColor();
-                graphics.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, barColor | 0xFF000000);
+                graphics.fill(x + 4, y + 26, x + 4 + barWidth, y + 28, barColor | 0xFF000000);
             }
+
             graphics.pose().popMatrix();
         }
     }
@@ -201,41 +195,48 @@ public class CustomHotbarRenderer {
         if (client.player == null) return;
         ItemStack offHand = client.player.getOffhandItem();
         if (offHand.isEmpty()) return;
-        int baseX = centerX - 42 - 31 - 13;
-        int baseY = bottomY + 3;
-        float slotSize = 10f;
+
+        int baseX = centerX - 84 - 62 - 26;
+        int baseY = bottomY + 7;
+
+        float slotSize = 20f;
         float defaultItemSize = 16f;
         float itemScale = slotSize / defaultItemSize;
 
         graphics.pose().pushMatrix();
         graphics.pose().translate(baseX, baseY);
         graphics.pose().scale(itemScale, itemScale);
+
         graphics.fakeItem(offHand, 0, 0);
         graphics.itemDecorations(client.font, offHand, 0, 0);
 
         if (offHand.getCount() > 1) {
             String countText = String.valueOf(offHand.getCount());
             graphics.text(client.font, countText,
-                    12 - client.font.width(countText), 9,
+                    24 - client.font.width(countText), 18,
                     0xFFFFFFFF, true);
         }
+
         if (offHand.isDamaged()) {
             float damage = (float) offHand.getDamageValue() / (float) offHand.getMaxDamage();
-            int barWidth = Math.round(13.0F - damage * 13.0F);
+            int barWidth = Math.round(26.0F - damage * 26.0F);
             int barColor = offHand.getBarColor();
-            graphics.fill(2, 13, 2 + barWidth, 14, barColor | 0xFF000000);
+            graphics.fill(4, 26, 4 + barWidth, 28, barColor | 0xFF000000);
         }
+
         graphics.pose().popMatrix();
     }
 
     private static void renderSelectedSlot(GuiGraphicsExtractor graphics, int centerX, int bottomY, Inventory inv) {
         int selected = inv.getSelectedSlot();
+
         int u = 97, v = 153;
-        int width = 14, height = 14;
+        int width = 28, height = 28;
         int selWidth = 103, selHeight = 103;
         int texWidth = 1836, texHeight = 256;
+
         int slotX = getSlotPositionsX(centerX)[selected];
-        int slotY = bottomY + 2;
+        int slotY = bottomY + 4;
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, WIDGETS, slotX, slotY,
                 u, v, width, height,
@@ -244,15 +245,15 @@ public class CustomHotbarRenderer {
 
     private static int[] getSlotPositionsX(int centerX) {
         int[] slotPositionsX = new int[9];
-        slotPositionsX[0] = centerX - 42 - 31;
-        slotPositionsX[1] = centerX - 27 - 31;
-        slotPositionsX[2] = centerX - 12 - 31;
-        slotPositionsX[3] = centerX - 29;
-        slotPositionsX[4] = centerX + 31 - 17;
-        slotPositionsX[5] = centerX + 31 + 14 - 16;
-        slotPositionsX[6] = centerX + 31 + 28 - 15;
-        slotPositionsX[7] = centerX + 31 + 42 - 15;
-        slotPositionsX[8] = centerX + 31 + 56 - 14;
+        slotPositionsX[0] = centerX - 84 - 62;
+        slotPositionsX[1] = centerX - 54 - 62;
+        slotPositionsX[2] = centerX - 24 - 62;
+        slotPositionsX[3] = centerX - 58;
+        slotPositionsX[4] = centerX + 62 - 34;
+        slotPositionsX[5] = centerX + 62 + 28 - 32;
+        slotPositionsX[6] = centerX + 62 + 56 - 30;
+        slotPositionsX[7] = centerX + 62 + 84 - 30;
+        slotPositionsX[8] = centerX + 62 + 112 - 28;
         return slotPositionsX;
     }
 

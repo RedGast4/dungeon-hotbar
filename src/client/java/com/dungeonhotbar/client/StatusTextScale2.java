@@ -7,19 +7,19 @@ import net.minecraft.world.entity.player.Player;
 
 import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
 
-public class StatusTextRenderer {
+public class StatusTextScale2 {
 
-    private static final int PLAYER_TEXT_OFFSET_X = 85;
-    private static final int PLAYER_TEXT_OFFSET_Y = 2;
-    private static final int MOUNT_TEXT_OFFSET_X  = 95;
-    private static final int MOUNT_TEXT_OFFSET_Y  = 16;
-    private static final int ARMOR_TEXT_OFFSET_X  = 75;
-    private static final int ARMOR_TEXT_OFFSET_Y  = 16;
-    private static final int FOOD_TEXT_OFFSET_X   = 95;
-    private static final int FOOD_TEXT_OFFSET_Y   = 16;
+    private static final int PLAYER_TEXT_OFFSET_X = 127;
+    private static final int PLAYER_TEXT_OFFSET_Y = 3;
+    private static final int MOUNT_TEXT_OFFSET_X  = 142;
+    private static final int MOUNT_TEXT_OFFSET_Y  = 24;
+    private static final int ARMOR_TEXT_OFFSET_X  = 112;
+    private static final int ARMOR_TEXT_OFFSET_Y  = 24;
+    private static final int FOOD_TEXT_OFFSET_X   = 142;
+    private static final int FOOD_TEXT_OFFSET_Y   = 24;
 
     private static final float SMOOTHING = 0.1f;
-    private static final float TEXT_SCALE = 0.4f;
+    private static final float TEXT_SCALE = 0.6f;
 
     private static float displayPlayerHp = 20;
     private static float displayMountHp = 0;
@@ -37,14 +37,13 @@ public class StatusTextRenderer {
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
         int centerX = screenWidth / 2;
-        int bottomY = screenHeight - 24;
-        int hotbarLeft = centerX - 91;
+        int bottomY = screenHeight - 36;
+        int hotbarLeft = centerX - 136;
 
         if (showPlayerHp) {
             float playerCur = player.getHealth() + player.getAbsorptionAmount();
             float playerMax = player.getMaxHealth() + player.getAbsorptionAmount();
             displayPlayerHp += (playerCur - displayPlayerHp) * SMOOTHING;
-
             drawStatWithIcon(graphics, client,
                     String.valueOf(Math.round(displayPlayerHp)),
                     String.valueOf(Math.round(playerMax)),
@@ -57,7 +56,6 @@ public class StatusTextRenderer {
             float mountCur = mount.getHealth() + mount.getAbsorptionAmount();
             float mountMax = mount.getMaxHealth() + mount.getAbsorptionAmount();
             displayMountHp += (mountCur - displayMountHp) * SMOOTHING;
-
             drawStatWithIcon(graphics, client,
                     String.valueOf(Math.round(displayMountHp)),
                     String.valueOf(Math.round(mountMax)),
@@ -70,7 +68,6 @@ public class StatusTextRenderer {
             float armorCur = player.getArmorValue();
             float armorMax = 20;
             displayArmor += (armorCur - displayArmor) * SMOOTHING;
-
             drawStatWithIcon(graphics, client,
                     String.valueOf(Math.round(displayArmor)),
                     String.valueOf(Math.round(armorMax)),
@@ -83,7 +80,6 @@ public class StatusTextRenderer {
             float foodCur = player.getFoodData().getFoodLevel();
             float foodMax = 20;
             displayFood += (foodCur - displayFood) * SMOOTHING;
-
             drawStatWithIcon(graphics, client,
                     String.valueOf(Math.round(displayFood)),
                     String.valueOf(Math.round(foodMax)),
@@ -96,7 +92,6 @@ public class StatusTextRenderer {
     private static void drawStatWithIcon(GuiGraphicsExtractor graphics, Minecraft client,
                                          String cur, String max, int x, int y,
                                          String colorHex, int iconIndex) {
-
         int colorMain = hexToArgb(colorHex);
         int colorSep = hexToArgb("#888888");
 
