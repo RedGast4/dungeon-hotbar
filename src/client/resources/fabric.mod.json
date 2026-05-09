@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "dungeonhotbar",
-	"version": "${version}",
+	"version": "1.0.2",
 	"name": "DungeonHotbar",
     "description": "A Fabric mod that replaces the default hotbar with a redesigned one inspired by Minecraft Dungeons.",
 	"authors": [
