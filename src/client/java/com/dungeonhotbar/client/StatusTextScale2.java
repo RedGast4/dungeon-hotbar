@@ -7,23 +7,20 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
 
-public class StatusTextRenderer {
+public class StatusTextScale2 {
 
-    // Смещения для каждой статистики
-    private static final int PLAYER_TEXT_OFFSET_X = 85;
-    private static final int PLAYER_TEXT_OFFSET_Y = 2;
-    private static final int MOUNT_TEXT_OFFSET_X  = 95;
-    private static final int MOUNT_TEXT_OFFSET_Y  = 16;
-    private static final int ARMOR_TEXT_OFFSET_X  = 75;
-    private static final int ARMOR_TEXT_OFFSET_Y  = 16;
-    private static final int FOOD_TEXT_OFFSET_X   = 95;
-    private static final int FOOD_TEXT_OFFSET_Y   = 16;
+    private static final int PLAYER_TEXT_OFFSET_X = 127;    // 85 × 1.5
+    private static final int PLAYER_TEXT_OFFSET_Y = 3;      // 2 × 1.5
+    private static final int MOUNT_TEXT_OFFSET_X  = 142;    // 95 × 1.5
+    private static final int MOUNT_TEXT_OFFSET_Y  = 24;     // 16 × 1.5
+    private static final int ARMOR_TEXT_OFFSET_X  = 112;    // 75 × 1.5
+    private static final int ARMOR_TEXT_OFFSET_Y  = 24;
+    private static final int FOOD_TEXT_OFFSET_X   = 142;
+    private static final int FOOD_TEXT_OFFSET_Y   = 24;
 
-    // Коэффициент сглаживания
     private static final float SMOOTHING = 0.1f;
-    private static final float TEXT_SCALE = 0.4f;
+    private static final float TEXT_SCALE = 0.6f;           // 0.4 × 1.5
 
-    // Отображаемые значения
     private static float displayPlayerHp = 20;
     private static float displayMountHp = 0;
     private static float displayArmor = 0;
@@ -40,15 +37,13 @@ public class StatusTextRenderer {
         int screenWidth = context.getScaledWindowWidth();
         int screenHeight = context.getScaledWindowHeight();
         int centerX = screenWidth / 2;
-        int bottomY = screenHeight - 24;
-        int hotbarLeft = centerX - 91;
+        int bottomY = screenHeight - 36;
+        int hotbarLeft = centerX - 136;
 
-        // --- Игрок HP ---
         if (showPlayerHp) {
             float playerCur = player.getHealth() + player.getAbsorptionAmount();
             float playerMax = player.getMaxHealth() + player.getAbsorptionAmount();
             displayPlayerHp += (playerCur - displayPlayerHp) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayPlayerHp)),
                     String.valueOf(Math.round(playerMax)),
@@ -57,12 +52,10 @@ public class StatusTextRenderer {
                     "#FFFFFF", 0);
         }
 
-        // --- Маунт HP ---
         if (showMountHp && hasMount && mount != null) {
             float mountCur = mount.getHealth() + mount.getAbsorptionAmount();
             float mountMax = mount.getMaxHealth() + mount.getAbsorptionAmount();
             displayMountHp += (mountCur - displayMountHp) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayMountHp)),
                     String.valueOf(Math.round(mountMax)),
@@ -71,12 +64,10 @@ public class StatusTextRenderer {
                     "#EF7E4A", 4);
         }
 
-        // --- Armor ---
         if (showArmor) {
             float armorCur = player.getArmor();
             float armorMax = 20;
             displayArmor += (armorCur - displayArmor) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayArmor)),
                     String.valueOf(Math.round(armorMax)),
@@ -85,12 +76,10 @@ public class StatusTextRenderer {
                     "#CACACA", 1);
         }
 
-        // --- Food ---
         if (showFood) {
             float foodCur = player.getHungerManager().getFoodLevel();
             float foodMax = 20;
             displayFood += (foodCur - displayFood) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayFood)),
                     String.valueOf(Math.round(foodMax)),
@@ -100,22 +89,9 @@ public class StatusTextRenderer {
         }
     }
 
-    /**
-     * Универсальный метод отрисовки текста со значением и иконкой.
-     *
-     * @param context контекст рисования
-     * @param client  клиент Minecraft
-     * @param cur     текущее значение
-     * @param max     максимальное значение
-     * @param x       координата X
-     * @param y       координата Y
-     * @param colorHex основной цвет текста
-     * @param iconIndex индекс иконки (в NumberRenderer)
-     */
     private static void drawStatWithIcon(DrawContext context, MinecraftClient client,
                                          String cur, String max, int x, int y,
                                          String colorHex, int iconIndex) {
-
         int colorMain = hexToArgb(colorHex);
         int colorSep = hexToArgb("#888888");
 
@@ -123,7 +99,6 @@ public class StatusTextRenderer {
         context.getMatrices().translate(x, y);
         context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE);
 
-        // Отрисовка иконки (если есть)
         NumberRenderer.drawIcon(context, iconIndex, 9, -10, 8, 8);
 
         int offset = 0;

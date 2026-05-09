@@ -24,6 +24,8 @@ public class HudInit {
         hide(VanillaHudElements.AIR_BAR);
         hide(VanillaHudElements.MOUNT_HEALTH);
         hide(VanillaHudElements.EXPERIENCE_LEVEL);
+        hide(VanillaHudElements.HELD_ITEM_TOOLTIP);
+
 
         // Подменяем ванильный хотбар на кастомный рендерер.
         HudElementRegistry.replaceElement(

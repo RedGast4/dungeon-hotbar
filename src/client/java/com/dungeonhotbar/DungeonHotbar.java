@@ -1,7 +1,7 @@
 package com.dungeonhotbar;
 
 import com.dungeonhotbar.client.HudInit;
-import com.dungeonhotbar.client.HudInitG;
+
 import net.fabricmc.api.ClientModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
