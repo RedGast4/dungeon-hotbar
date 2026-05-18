@@ -173,20 +173,6 @@ public class HotbarScale3 {
             graphics.fakeItem(stack, 0, 0);
             graphics.itemDecorations(client.font, stack, 0, 0);
 
-            if (stack.getCount() > 1) {
-                String countText = String.valueOf(stack.getCount());
-                graphics.text(client.font, countText,
-                        x + 24 - client.font.width(countText), y + 18,
-                        0xFFFFFFFF, true);
-            }
-
-            if (stack.isDamaged()) {
-                float damage = (float) stack.getDamageValue() / (float) stack.getMaxDamage();
-                int barWidth = Math.round(26.0F - damage * 26.0F);
-                int barColor = stack.getBarColor();
-                graphics.fill(x + 4, y + 26, x + 4 + barWidth, y + 28, barColor | 0xFF000000);
-            }
-
             graphics.pose().popMatrix();
         }
     }
@@ -194,7 +180,6 @@ public class HotbarScale3 {
     private static void renderVanillaOffHand(GuiGraphicsExtractor graphics, int centerX, int bottomY, Minecraft client) {
         if (client.player == null) return;
         ItemStack offHand = client.player.getOffhandItem();
-        if (offHand.isEmpty()) return;
 
         int baseX = centerX - 84 - 62 - 26;
         int baseY = bottomY + 7;
@@ -207,21 +192,9 @@ public class HotbarScale3 {
         graphics.pose().translate(baseX, baseY);
         graphics.pose().scale(itemScale, itemScale);
 
-        graphics.fakeItem(offHand, 0, 0);
-        graphics.itemDecorations(client.font, offHand, 0, 0);
-
-        if (offHand.getCount() > 1) {
-            String countText = String.valueOf(offHand.getCount());
-            graphics.text(client.font, countText,
-                    24 - client.font.width(countText), 18,
-                    0xFFFFFFFF, true);
-        }
-
-        if (offHand.isDamaged()) {
-            float damage = (float) offHand.getDamageValue() / (float) offHand.getMaxDamage();
-            int barWidth = Math.round(26.0F - damage * 26.0F);
-            int barColor = offHand.getBarColor();
-            graphics.fill(4, 26, 4 + barWidth, 28, barColor | 0xFF000000);
+        if (!offHand.isEmpty()) {
+            graphics.fakeItem(offHand, 0, 0);
+            graphics.itemDecorations(client.font, offHand, 0, 0);
         }
 
         graphics.pose().popMatrix();

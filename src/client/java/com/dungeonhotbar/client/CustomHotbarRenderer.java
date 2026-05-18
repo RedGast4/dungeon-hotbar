@@ -180,19 +180,6 @@ public class CustomHotbarRenderer {
             graphics.pose().scale(itemScale, itemScale);
             graphics.fakeItem(stack, 0, 0);
             graphics.itemDecorations(client.font, stack, 0, 0);
-
-            if (stack.getCount() > 1) {
-                String countText = String.valueOf(stack.getCount());
-                graphics.text(client.font, countText,
-                        x + 12 - client.font.width(countText), y + 9,
-                        0xFFFFFFFF, true);
-            }
-            if (stack.isDamaged()) {
-                float damage = (float) stack.getDamageValue() / (float) stack.getMaxDamage();
-                int barWidth = Math.round(13.0F - damage * 13.0F);
-                int barColor = stack.getBarColor();
-                graphics.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, barColor | 0xFF000000);
-            }
             graphics.pose().popMatrix();
         }
     }
@@ -200,7 +187,6 @@ public class CustomHotbarRenderer {
     private static void renderVanillaOffHand(GuiGraphicsExtractor graphics, int centerX, int bottomY, Minecraft client) {
         if (client.player == null) return;
         ItemStack offHand = client.player.getOffhandItem();
-        if (offHand.isEmpty()) return;
         int baseX = centerX - 42 - 31 - 13;
         int baseY = bottomY + 3;
         float slotSize = 10f;
@@ -210,20 +196,10 @@ public class CustomHotbarRenderer {
         graphics.pose().pushMatrix();
         graphics.pose().translate(baseX, baseY);
         graphics.pose().scale(itemScale, itemScale);
-        graphics.fakeItem(offHand, 0, 0);
-        graphics.itemDecorations(client.font, offHand, 0, 0);
 
-        if (offHand.getCount() > 1) {
-            String countText = String.valueOf(offHand.getCount());
-            graphics.text(client.font, countText,
-                    12 - client.font.width(countText), 9,
-                    0xFFFFFFFF, true);
-        }
-        if (offHand.isDamaged()) {
-            float damage = (float) offHand.getDamageValue() / (float) offHand.getMaxDamage();
-            int barWidth = Math.round(13.0F - damage * 13.0F);
-            int barColor = offHand.getBarColor();
-            graphics.fill(2, 13, 2 + barWidth, 14, barColor | 0xFF000000);
+        if (!offHand.isEmpty()) {
+            graphics.fakeItem(offHand, 0, 0);
+            graphics.itemDecorations(client.font, offHand, 0, 0);
         }
         graphics.pose().popMatrix();
     }
