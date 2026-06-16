@@ -40,9 +40,7 @@ public class BarsRenderer {
         int centerX = screenWidth / 2;
         int bottomY = screenHeight - 55;
 
-        int iconX = centerX - 23;
-        int iconY = bottomY + 48;
-        drawIcon(context, 0, iconX, iconY, 3, 3, 8, 8);
+
         // --- WATER BAR ---
         boolean playerUnderwater = player.getAir() < player.getMaxAir();
         if (showWaterBar && playerUnderwater && !player.isCreative()) {
@@ -52,6 +50,9 @@ public class BarsRenderer {
             renderBarX(context, client, TEX_WATER_U, TEX_WATER_V,
                     centerX - 50 - 20, bottomY + 50,
                     displayWater, "", "#3CAFFF");
+            int iconX = centerX - 23;
+            int iconY = bottomY + 45;
+            drawIcon(context, 0, iconX, iconY, 2, 2, 8, 8);
         }
 
 
