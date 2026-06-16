@@ -40,10 +40,6 @@ public class BarsScale2 {
         int centerX = screenWidth / 2;
         int bottomY = screenHeight - 82;                // 55 × 1.5
 
-        int iconX = centerX - 34;                       // 23 × 1.5
-        int iconY = bottomY + 72;                       // 48 × 1.5
-        drawIcon(context, 0, iconX, iconY, 8, 8, 8, 8);
-
         boolean playerUnderwater = player.getAir() < player.getMaxAir();
         if (showWaterBar && playerUnderwater && !player.isCreative()) {
             float airRatio = player.getAir() / (float) player.getMaxAir();
@@ -52,6 +48,9 @@ public class BarsScale2 {
                     centerX - 75 - 30,                  // (50+20)×1.5
                     bottomY + 75,                       // 50 × 1.5
                     displayWater, "", "#3CAFFF");
+            int iconX = centerX - 34;                       // 23 × 1.5
+            int iconY = bottomY + 70;                       // 48 × 1.5
+            drawIcon(context, 0, iconX, iconY, 7, 7, 8, 8);
         }
 
         boolean showJumpBar = false;

@@ -40,11 +40,6 @@ public class BarsScale1 {
         int centerX = screenWidth / 2;
         int bottomY = screenHeight - 137;            // −55 × 2.5 = −137
 
-        // Иконка воды: −23×2.5=−57, 48×2.5=120, размер 8→20
-        int iconX = centerX - 57+47;
-        int iconY = bottomY + 126;
-        drawIcon(context, 0, iconX, iconY, 20, 20, 20, 20);
-
         // --- WATER BAR ---
         boolean playerUnderwater = player.getAir() < player.getMaxAir();
         if (showWaterBar && playerUnderwater && !player.isCreative()) {
@@ -52,8 +47,12 @@ public class BarsScale1 {
             displayWater += (airRatio - displayWater) * SMOOTHING;
             renderBarX(context, client, TEX_WATER_U, TEX_WATER_V,
                     centerX - 125 - 50 + 47,             // −175 = (−50−20)×2.5
-                    bottomY + 130,                  // 50 × 2.5 = 125
+                    bottomY + 137,                  // 50 × 2.5 = 125
                     displayWater, "", "#3CAFFF");
+            // Иконка воды: −23×2.5=−57, 48×2.5=120, размер 8→20
+            int iconX = centerX - 57+47;
+            int iconY = bottomY + 126;
+            drawIcon(context, 0, iconX, iconY, 19, 19, 20, 20);
         }
 
         boolean showJumpBar = false;
