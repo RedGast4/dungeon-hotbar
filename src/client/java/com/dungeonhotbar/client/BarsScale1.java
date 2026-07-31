@@ -1,34 +1,40 @@
 package com.dungeonhotbar.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.passive.CamelEntity;
 import net.minecraft.util.Identifier;
 
-import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
+import static com.dungeonhotbar.client.hud.HotbarRenderer.hexToArgb;
 
 public class BarsScale1 {
 
-    private static final Identifier ICONS = Identifier.of("dungeonhotbar", "textures/gui/icons.png");
+    private static final Identifier BAR_WATER = new Identifier("dungeonhotbar", "textures/gui/progress_bar_water_air.png");
+    private static final Identifier BAR_LEVEL = new Identifier("dungeonhotbar", "textures/gui/progress_bar_enchanment.png");
+    private static final Identifier BAR_JUMP = new Identifier("dungeonhotbar", "textures/gui/progress_bar_jump_mount.png");
+    private static final Identifier BAR_EMPTY = new Identifier("dungeonhotbar", "textures/gui/progress_bar_zero_down.png");
 
-    private static final int TEX_WATER_U = 12, TEX_WATER_V = 165;
-    private static final int TEX_LVL_U = 12, TEX_LVL_V = 163;
-    private static final int TEX_JMP_U = 12, TEX_JMP_V = 167;
-    private static final int TEX_BAR_WIDTH = 112;    // 45 × 2.5 = 112
-    private static final int TEX_BAR_HEIGHT = 2;     // 1 × 2.5 = 2
-    private static final int TEX_BAR_WIDTH_REG = 100;
-    private static final int TEX_BAR_HEIGHT_REG = 2;
+    private static final int BAR_TEX_WIDTH = 100;
+    private static final int BAR_TEX_HEIGHT = 2;
+
+    private static final int BAR_DISPLAY_WIDTH = 112;
+    private static final int BAR_DISPLAY_HEIGHT = 2;
+
+    private static final float BAR_SCALE_X = (float) BAR_DISPLAY_WIDTH / BAR_TEX_WIDTH;
+    private static final float BAR_SCALE_Y = (float) BAR_DISPLAY_HEIGHT / BAR_TEX_HEIGHT;
 
     private static final float SMOOTHING = 0.1f;
     private static float displayWater = 1f;
     private static float displayLevel = 0f;
     private static float displayJump = 0f;
 
-    private static final float TEXT_SCALE = 0.8f;    // 0.32 × 2.5 = 0.8
+    private static final float TEXT_SCALE = 1.0f;
+    private static final int BAR_ICON_SIZE = 10;
 
     public static void render(DrawContext context, boolean showWaterBar, boolean LvLBar) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -38,23 +44,26 @@ public class BarsScale1 {
         int screenWidth = context.getScaledWindowWidth();
         int screenHeight = context.getScaledWindowHeight();
         int centerX = screenWidth / 2;
-        int bottomY = screenHeight - 137;            // −55 × 2.5 = −137
+        int bottomY = screenHeight - 137;
 
-
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.enableBlend();
 
         // --- WATER BAR ---
         boolean playerUnderwater = player.getAir() < player.getMaxAir();
         if (showWaterBar && playerUnderwater && !player.isCreative()) {
             float airRatio = player.getAir() / (float) player.getMaxAir();
             displayWater += (airRatio - displayWater) * SMOOTHING;
-            renderBarX(context, client, TEX_WATER_U, TEX_WATER_V,
-                    centerX - 125 - 50 + 47,             // −175 = (−50−20)×2.5
-                    bottomY + 137,                  // 50 × 2.5 = 125
-                    displayWater, "", "#3CAFFF");
-            // Иконка воды: −23×2.5=−57, 48×2.5=120, размер 8→20
-            int iconX = centerX - 57+47;
-            int iconY = bottomY + 126;
-            drawIcon(context, 0, iconX, iconY, 19, 19, 20, 20);
+
+            int barX = centerX - 125 - 50 + 47;
+            int barY = bottomY + 130;
+
+            renderBar(context, client, BAR_WATER, barX, barY,
+                    displayWater, "", "#3CAFFF", false);
+
+            int iconX = centerX - 57 + 47;
+            int iconY = bottomY + 123;
+            NumberRenderer.drawIcon(context, 3, iconX, iconY, BAR_ICON_SIZE, BAR_ICON_SIZE);
         }
 
         boolean showJumpBar = false;
@@ -63,17 +72,15 @@ public class BarsScale1 {
         if (player.hasVehicle() && player.getVehicle() instanceof LivingEntity mount) {
             float jumpRatio = 0f;
 
-            if (mount.getAttributes().hasAttribute(EntityAttributes.JUMP_STRENGTH)) {
+            if (mount.getAttributes().hasAttribute(EntityAttributes.HORSE_JUMP_STRENGTH)) {
                 jumpRatio = player.getMountJumpStrength();
                 if (jumpRatio > 0.99f) jumpRatio = 1.0f;
                 showJumpBar = jumpRatio > 0f;
             }
-            else if (mount.getType().toString().contains("camel")) {
+            else if (mount instanceof CamelEntity camel) {
                 try {
-                    var camel = (CamelEntity) mount;
-                    int cooldown = camel.getJumpCooldown();
-                    int last = CamelEntity.DASHING.id();
-                    float dashRatio = Math.max(0f, 1f - ((float) last / (float) cooldown));
+                    float cooldown = camel.getJumpCooldown();
+                    float dashRatio = Math.max(0f, 1f - cooldown);
                     if (dashRatio > 0.99f) dashRatio = 1.0f;
                     jumpRatio = dashRatio;
                     showJumpBar = dashRatio < 1f;
@@ -83,70 +90,78 @@ public class BarsScale1 {
             if (showJumpBar) {
                 displayJump += (jumpRatio - displayJump) * (SMOOTHING * 2f);
                 if (jumpRatio >= 0.99f) displayJump = 1.0f;
-                renderBarX(context, client, TEX_JMP_U, TEX_JMP_V,
-                        centerX - 125 + 247,         // +75 = (−50+80)×2.5
-                        bottomY + 130,
-                        displayJump, "JMP", "#FFFFFF");
+
+                int barX = centerX - 125 + 247;
+                int barY = bottomY + 130;
+
+                renderBar(context, client, BAR_JUMP, barX, barY,
+                        displayJump, "JMP", "#FFFFFF", true);
             }
         }
 
-        // --- LEVEL BAR ---
+        // --- LEVEL BAR (текст на одной линии с баром) ---
         if (LvLBar && !showJumpBar) {
             float lvlRatio = Math.min(player.experienceProgress, 1f);
             displayLevel += (lvlRatio - displayLevel) * SMOOTHING;
             int displayLvl = Math.min(player.experienceLevel, 999);
-            renderBarX(context, client, TEX_LVL_U, TEX_LVL_V,
-                    centerX - 125 + 247,
-                    bottomY + 130,
-                    displayLevel, "LVL " + displayLvl, "#FFFFFF");
+
+            int barX = centerX - 125 + 247;
+            int barY = bottomY + 130;
+
+            renderBar(context, client, BAR_LEVEL, barX, barY,
+                    displayLevel, "LVL " + displayLvl, "#FFFFFF", true);
         }
+
+        RenderSystem.disableBlend();
     }
 
-    private static void renderBarX(DrawContext context, MinecraftClient client,
-                                   int u, int v, int x, int y,
-                                   float fillRatio, String label, String colorHex) {
+    private static void renderBar(DrawContext context, MinecraftClient client,
+                                  Identifier barTexture,
+                                  int x, int y,
+                                  float fillRatio, String label, String colorHex,
+                                  boolean labelOnSameLine) {
         int colorText = hexToArgb(colorHex);
 
-        // Подпись: −13×2.5=−32, −1×2.5=−2
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(x - 32, y - 2);
-        context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE);
-        context.drawText(client.textRenderer, label, 0, 0, colorText, false);
-        context.getMatrices().popMatrix();
-
-        int grayColor = hexToArgb("#202020");
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, ICONS,
-                x, y, u, v, TEX_BAR_WIDTH, TEX_BAR_HEIGHT,
-                TEX_BAR_WIDTH_REG, TEX_BAR_HEIGHT_REG,
-                512, 512, grayColor);
-
-        int fillWidth = Math.round(TEX_BAR_WIDTH * fillRatio);
-        if (fillWidth <= 0) return;
-
-        context.enableScissor(x, y, x + fillWidth, y + TEX_BAR_HEIGHT);
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, ICONS,
-                x, y, u, v, TEX_BAR_WIDTH, TEX_BAR_HEIGHT,
-                TEX_BAR_WIDTH_REG, TEX_BAR_HEIGHT_REG,
-                512, 512);
-        context.disableScissor();
-    }
-
-    public static void drawIcon(DrawContext context, int iconIndex, int x, int y,
-                                int texWidth, int texHeight, int width, int height) {
-        int u = 0, v = 0;
-        switch (iconIndex) {
-            case 0 -> { u = 37; v = 131; }
+        // Подпись
+        if (!label.isEmpty()) {
+            context.getMatrices().push();
+            if (labelOnSameLine) {
+                // Текст на одной линии с баром (слева от бара)
+                context.getMatrices().translate(x - 8, y - 2, 0);
+                context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE, 1.0f);
+                int textWidth = client.textRenderer.getWidth(label);
+                context.drawText(client.textRenderer, label, -textWidth, 0, colorText, false);
+            } else {
+                // Текст над баром
+                context.getMatrices().translate(x - 32, y - 8, 0);
+                context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE, 1.0f);
+                context.drawText(client.textRenderer, label, 0, 0, colorText, false);
+            }
+            context.getMatrices().pop();
         }
 
-        context.drawTexture(
-                RenderPipelines.GUI_TEXTURED,
-                ICONS,
-                x, y,
-                u, v,
-                texWidth, texHeight,
-                width, height,
-                512, 512,
-                0xFFFFFFFF
-        );
+        // Пустой фон
+        RenderSystem.setShaderColor(0.125f, 0.125f, 0.125f, 1.0f);
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(BAR_SCALE_X, BAR_SCALE_Y, 1.0f);
+        context.drawTexture(BAR_EMPTY, 0, 0, 0, 0, BAR_TEX_WIDTH, BAR_TEX_HEIGHT, BAR_TEX_WIDTH, BAR_TEX_HEIGHT);
+        context.getMatrices().pop();
+
+        int fillWidth = Math.round(BAR_DISPLAY_WIDTH * fillRatio);
+        if (fillWidth <= 0) {
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            return;
+        }
+
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+        context.enableScissor(x, y, x + fillWidth, y + BAR_DISPLAY_HEIGHT);
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(BAR_SCALE_X, BAR_SCALE_Y, 1.0f);
+        context.drawTexture(barTexture, 0, 0, 0, 0, BAR_TEX_WIDTH, BAR_TEX_HEIGHT, BAR_TEX_WIDTH, BAR_TEX_HEIGHT);
+        context.getMatrices().pop();
+        context.disableScissor();
     }
 }

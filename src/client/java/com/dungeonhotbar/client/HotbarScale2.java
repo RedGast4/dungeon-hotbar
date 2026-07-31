@@ -1,21 +1,42 @@
 package com.dungeonhotbar.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.Identifier;
 
-import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
+import static com.dungeonhotbar.client.hud.HotbarRenderer.hexToArgb;
 import static net.minecraft.client.MinecraftClient.getInstance;
 
 public class HotbarScale2 {
 
-    private static final Identifier WIDGETS = Identifier.of("dungeonhotbar", "textures/gui/widgets.png");
-    private static final Identifier FRAME = Identifier.of("dungeonhotbar", "textures/gui/icons.png");
-    private static final Identifier HEARTH = Identifier.of("dungeonhotbar", "textures/gui/hearth_bar.png");
+    private static final Identifier WIDGETS = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar.png");
+    private static final Identifier SELECTED_SLOT = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar_select.png");
+    private static final Identifier FRAME = new Identifier("dungeonhotbar", "textures/gui/dungeon_frame_health.png");
+    private static final Identifier HEARTH = new Identifier("dungeonhotbar", "textures/gui/dungeon_health.png");
+
+    private static final int WIDGETS_WIDTH = 1636;
+    private static final int WIDGETS_HEIGHT = 210;
+    private static final int SELECT_SLOT_WIDTH = 103;
+    private static final int SELECT_SLOT_HEIGHT = 103;
+    private static final int FRAME_WIDTH = 310;
+    private static final int FRAME_HEIGHT = 270;
+    private static final int HEARTH_WIDTH = 257;
+    private static final int HEARTH_HEIGHT = 202;
+
+    // Scale2: ×1.5
+    private static final float WIDGETS_SCALE_X = 273f / WIDGETS_WIDTH;
+    private static final float WIDGETS_SCALE_Y = 33f / WIDGETS_HEIGHT;
+    private static final float SLOT_SCALE_X = 21f / SELECT_SLOT_WIDTH;
+    private static final float SLOT_SCALE_Y = 21f / SELECT_SLOT_HEIGHT;
+    private static final float FRAME_SCALE_X = 42f / FRAME_WIDTH;
+    private static final float FRAME_SCALE_Y = 42f / FRAME_HEIGHT;
+    private static final float HEARTH_SCALE_X = 36f / HEARTH_WIDTH;
+    private static final float HEARTH_SCALE_Y = 36f / HEARTH_HEIGHT;
 
     private static float displayHealth = 20f;
 
@@ -33,22 +54,25 @@ public class HotbarScale2 {
         float currentHealth = client.player.getHealth();
         displayHealth += (currentHealth - displayHealth) * 0.1f;
 
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, WIDGETS,
-                centerX - 136, bottomY,
-                200, 46,
-                273, 33,
-                1636, 210,
-                1836, 256
-        );
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.enableBlend();
+
+        // WIDGETS
+        context.getMatrices().push();
+        context.getMatrices().translate(centerX - 136, bottomY, 0);
+        context.getMatrices().scale(WIDGETS_SCALE_X, WIDGETS_SCALE_Y, 1.0f);
+        context.drawTexture(WIDGETS, 0, 0, 0, 0, WIDGETS_WIDTH, WIDGETS_HEIGHT, WIDGETS_WIDTH, WIDGETS_HEIGHT);
+        context.getMatrices().pop();
 
         boolean isCreative = client.player.isCreative();
         boolean isOnMount = client.player.hasVehicle() && client.player.getVehicle() instanceof LivingEntity;
 
-        boolean showPlayerHp2 = false;
         boolean showPlayerHp = false;
+        boolean showPlayerHp2 = false;
         boolean showMountHp = false;
         boolean showArmor = false;
-        boolean snowFood = false;
+        boolean showFood = false;
         boolean showWaterBar = false;
         boolean LvLBar = true;
 
@@ -59,11 +83,11 @@ public class HotbarScale2 {
                 showMountHp = true;
                 showArmor = true;
             } else {
-                showWaterBar = true;
                 showPlayerHp = true;
                 showPlayerHp2 = true;
                 showArmor = true;
-                snowFood = true;
+                showFood = true;
+                showWaterBar = true;
             }
         } else {
             if (isOnMount) {
@@ -79,7 +103,7 @@ public class HotbarScale2 {
 
         renderItemName(context, client, centerX - 21, bottomY - 13, 42);
 
-        StatusTextScale2.render(context, showPlayerHp, showMountHp, showArmor, snowFood);
+        StatusTextScale2.render(context, showPlayerHp, showMountHp, showArmor, showFood);
 
         int[] offsetX = {3, 3, 3, 3, 3, 3, 3, 3, 3};
         int[] offsetY = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -89,6 +113,8 @@ public class HotbarScale2 {
 
         renderVanillaOffHand(context, centerX, bottomY, client);
         BarsScale2.render(context, showWaterBar, LvLBar);
+
+        RenderSystem.disableBlend();
     }
 
     private static void renderHeart(DrawContext context, int centerX, int bottomY, MinecraftClient client) {
@@ -111,30 +137,34 @@ public class HotbarScale2 {
         int heartX = centerX - 18;
         int heartY = frameY + 3;
 
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, FRAME,
-                frameX, frameY,
-                0, 234,
-                42, 42,
-                310, 271,
-                512, 512
-        );
+        // FRAME
+        context.getMatrices().push();
+        context.getMatrices().translate(frameX, frameY, 0);
+        context.getMatrices().scale(FRAME_SCALE_X, FRAME_SCALE_Y, 1.0f);
+        context.drawTexture(FRAME, 0, 0, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT);
+        context.getMatrices().pop();
 
         if (visibleHeight > 0) {
+            float r = ((tint >> 16) & 0xFF) / 255.0f;
+            float g = ((tint >> 8) & 0xFF) / 255.0f;
+            float b = (tint & 0xFF) / 255.0f;
+            RenderSystem.setShaderColor(r, g, b, 1.0f);
+
             context.enableScissor(
                     heartX,
                     heartY + (heartHeight - visibleHeight),
                     heartX + heartWidth,
                     heartY + heartHeight
             );
-            context.drawTexture(RenderPipelines.GUI_TEXTURED, HEARTH,
-                    heartX, heartY,
-                    0, 202,
-                    heartWidth, heartHeight,
-                    257, 202,
-                    257, 606,
-                    tint
-            );
+            // HEARTH
+            context.getMatrices().push();
+            context.getMatrices().translate(heartX, heartY, 0);
+            context.getMatrices().scale(HEARTH_SCALE_X, HEARTH_SCALE_Y, 1.0f);
+            context.drawTexture(HEARTH, 0, 0, 0, 0, HEARTH_WIDTH, HEARTH_HEIGHT, HEARTH_WIDTH, HEARTH_HEIGHT);
+            context.getMatrices().pop();
             context.disableScissor();
+
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
 
@@ -164,16 +194,17 @@ public class HotbarScale2 {
             int x = slotPositionsX[i] + offsetX[i];
             int y = slotY + offsetY[i];
 
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate(x, y);
-            context.getMatrices().scale(scale, scale);
+            context.getMatrices().push();
+            context.getMatrices().translate(x, y, 0);
+            context.getMatrices().scale(scale, scale, 1.0f);
 
             context.drawItem(stack, 0, 0);
-            context.drawStackOverlay(client.textRenderer, stack, 0, 0);
+            context.drawItemInSlot(client.textRenderer, stack, 0, 0);
 
             if (stack.getCount() > 1) {
                 String countText = String.valueOf(stack.getCount());
-                context.drawText(client.textRenderer, countText, x + 18 - client.textRenderer.getWidth(countText), y + 13, 0xFFFFFF, true);
+                context.drawText(client.textRenderer, countText,
+                        x + 18 - client.textRenderer.getWidth(countText), y + 13, 0xFFFFFF, true);
             }
 
             if (stack.isDamaged()) {
@@ -183,7 +214,7 @@ public class HotbarScale2 {
                 context.fill(x + 3, y + 19, x + 3 + barWidth, y + 21, barColor | 0xFF000000);
             }
 
-            context.getMatrices().popMatrix();
+            context.getMatrices().pop();
         }
     }
 
@@ -199,12 +230,12 @@ public class HotbarScale2 {
         float defaultItemSize = 16f;
         float scale = slotSize / defaultItemSize;
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(baseX, baseY);
-        context.getMatrices().scale(scale, scale);
+        context.getMatrices().push();
+        context.getMatrices().translate(baseX, baseY, 0);
+        context.getMatrices().scale(scale, scale, 1.0f);
 
         context.drawItem(offHand, 0, 0);
-        context.drawStackOverlay(client.textRenderer, offHand, 0, 0);
+        context.drawItemInSlot(client.textRenderer, offHand, 0, 0);
 
         if (offHand.getCount() > 1) {
             String countText = String.valueOf(offHand.getCount());
@@ -220,23 +251,19 @@ public class HotbarScale2 {
             context.fill(3, 19, 3 + barWidth, 21, barColor | 0xFF000000);
         }
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
     }
 
     private static void renderSelectedSlot(DrawContext context, int centerX, int bottomY, PlayerInventory inv) {
-        int selected = inv.getSelectedSlot();
-
-        int u = 97, v = 153;
-        int width = 21, height = 21;
-        int selWidth = 103, selHeight = 103;
-        int texWidth = 1836, texHeight = 256;
-
+        int selected = inv.selectedSlot;
         int slotX = getSlotPositionsX(centerX)[selected];
         int slotY = bottomY + 3;
 
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, WIDGETS, slotX, slotY,
-                u, v, width, height,
-                selWidth, selHeight, texWidth, texHeight);
+        context.getMatrices().push();
+        context.getMatrices().translate(slotX, slotY, 0);
+        context.getMatrices().scale(SLOT_SCALE_X, SLOT_SCALE_Y, 1.0f);
+        context.drawTexture(SELECTED_SLOT, 0, 0, 0, 0, SELECT_SLOT_WIDTH, SELECT_SLOT_HEIGHT, SELECT_SLOT_WIDTH, SELECT_SLOT_HEIGHT);
+        context.getMatrices().pop();
     }
 
     private static int[] getSlotPositionsX(int centerX) {

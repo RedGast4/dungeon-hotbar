@@ -10,7 +10,6 @@ public class ScaleDetector {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client != null && client.options != null) {
             int scale = client.options.getGuiScale().getValue();
-            // 0 = auto, используем 2
             return scale == 0 ? 2 : scale;
         }
         return 2;

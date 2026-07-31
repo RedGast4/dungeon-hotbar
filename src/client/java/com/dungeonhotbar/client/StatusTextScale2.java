@@ -5,21 +5,25 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
-import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
+import static com.dungeonhotbar.client.hud.HotbarRenderer.hexToArgb;
 
 public class StatusTextScale2 {
 
     private static final int PLAYER_TEXT_OFFSET_X = 127;    // 85 × 1.5
     private static final int PLAYER_TEXT_OFFSET_Y = 3;      // 2 × 1.5
     private static final int MOUNT_TEXT_OFFSET_X  = 142;    // 95 × 1.5
-    private static final int MOUNT_TEXT_OFFSET_Y  = 24;     // 16 × 1.5
+    private static final int MOUNT_TEXT_OFFSET_Y  = 29;     // 16 × 1.5
     private static final int ARMOR_TEXT_OFFSET_X  = 112;    // 75 × 1.5
-    private static final int ARMOR_TEXT_OFFSET_Y  = 24;
+    private static final int ARMOR_TEXT_OFFSET_Y  = 29;
     private static final int FOOD_TEXT_OFFSET_X   = 142;
-    private static final int FOOD_TEXT_OFFSET_Y   = 24;
+    private static final int FOOD_TEXT_OFFSET_Y   = 29;
 
     private static final float SMOOTHING = 0.1f;
     private static final float TEXT_SCALE = 0.6f;           // 0.4 × 1.5
+
+    // Scale2: размер иконки ×1.5 (8→12)
+    private static final int ICON_SIZE = 10;
+    private static final int ICON_OFFSET_Y = 3;
 
     private static float displayPlayerHp = 20;
     private static float displayMountHp = 0;
@@ -95,11 +99,17 @@ public class StatusTextScale2 {
         int colorMain = hexToArgb(colorHex);
         int colorSep = hexToArgb("#888888");
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(x, y);
-        context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE);
+        String fullText = cur + "/" + max;
+        int textWidth = client.textRenderer.getWidth(fullText);
 
-        NumberRenderer.drawIcon(context, iconIndex, 9, -10, 8, 8);
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE, 1.0f);
+
+        // Иконка СВЕРХУ по ЦЕНТРУ
+        int iconX = (textWidth - ICON_SIZE) / 2;
+        int iconY = -ICON_SIZE - ICON_OFFSET_Y;
+        NumberRenderer.drawIcon(context, iconIndex, iconX, iconY, ICON_SIZE, ICON_SIZE);
 
         int offset = 0;
         context.drawText(client.textRenderer, cur, offset, 0, colorMain, false);
@@ -108,6 +118,6 @@ public class StatusTextScale2 {
         offset += client.textRenderer.getWidth("/");
         context.drawText(client.textRenderer, max, offset, 0, colorMain, false);
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
     }
 }

@@ -5,21 +5,25 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
-import static com.dungeonhotbar.client.CustomHotbarRenderer.hexToArgb;
+import static com.dungeonhotbar.client.hud.HotbarRenderer.hexToArgb;
 
 public class StatusTextScale3 {
 
-    private static final int PLAYER_TEXT_OFFSET_X = 170;    // 85 × 2
-    private static final int PLAYER_TEXT_OFFSET_Y = 4;      // 2 × 2
-    private static final int MOUNT_TEXT_OFFSET_X  = 190;    // 95 × 2
-    private static final int MOUNT_TEXT_OFFSET_Y  = 32;     // 16 × 2
-    private static final int ARMOR_TEXT_OFFSET_X  = 150;    // 75 × 2
-    private static final int ARMOR_TEXT_OFFSET_Y  = 32;
+    private static final int PLAYER_TEXT_OFFSET_X = 170;    // 85 × 2.0
+    private static final int PLAYER_TEXT_OFFSET_Y = 4;      // 2 × 2.0
+    private static final int MOUNT_TEXT_OFFSET_X  = 190;    // 95 × 2.0
+    private static final int MOUNT_TEXT_OFFSET_Y  = 37;     // 16 × 2.0
+    private static final int ARMOR_TEXT_OFFSET_X  = 150;    // 75 × 2.0
+    private static final int ARMOR_TEXT_OFFSET_Y  = 37;
     private static final int FOOD_TEXT_OFFSET_X   = 190;
-    private static final int FOOD_TEXT_OFFSET_Y   = 32;
+    private static final int FOOD_TEXT_OFFSET_Y   = 37;
 
     private static final float SMOOTHING = 0.1f;
-    private static final float TEXT_SCALE = 0.8f;           // 0.4 × 2
+    private static final float TEXT_SCALE = 0.8f;           // 0.4 × 2.0
+
+    // Scale3: размер иконки ×2.0 (8→16)
+    private static final int ICON_SIZE = 14;
+    private static final int ICON_OFFSET_Y = 4;
 
     private static float displayPlayerHp = 20;
     private static float displayMountHp = 0;
@@ -40,12 +44,10 @@ public class StatusTextScale3 {
         int bottomY = screenHeight - 48;
         int hotbarLeft = centerX - 182;
 
-        // --- Игрок HP ---
         if (showPlayerHp) {
             float playerCur = player.getHealth() + player.getAbsorptionAmount();
             float playerMax = player.getMaxHealth() + player.getAbsorptionAmount();
             displayPlayerHp += (playerCur - displayPlayerHp) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayPlayerHp)),
                     String.valueOf(Math.round(playerMax)),
@@ -54,12 +56,10 @@ public class StatusTextScale3 {
                     "#FFFFFF", 0);
         }
 
-        // --- Маунт HP ---
         if (showMountHp && hasMount && mount != null) {
             float mountCur = mount.getHealth() + mount.getAbsorptionAmount();
             float mountMax = mount.getMaxHealth() + mount.getAbsorptionAmount();
             displayMountHp += (mountCur - displayMountHp) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayMountHp)),
                     String.valueOf(Math.round(mountMax)),
@@ -68,12 +68,10 @@ public class StatusTextScale3 {
                     "#EF7E4A", 4);
         }
 
-        // --- Armor ---
         if (showArmor) {
             float armorCur = player.getArmor();
             float armorMax = 20;
             displayArmor += (armorCur - displayArmor) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayArmor)),
                     String.valueOf(Math.round(armorMax)),
@@ -82,12 +80,10 @@ public class StatusTextScale3 {
                     "#CACACA", 1);
         }
 
-        // --- Food ---
         if (showFood) {
             float foodCur = player.getHungerManager().getFoodLevel();
             float foodMax = 20;
             displayFood += (foodCur - displayFood) * SMOOTHING;
-
             drawStatWithIcon(context, client,
                     String.valueOf(Math.round(displayFood)),
                     String.valueOf(Math.round(foodMax)),
@@ -100,16 +96,20 @@ public class StatusTextScale3 {
     private static void drawStatWithIcon(DrawContext context, MinecraftClient client,
                                          String cur, String max, int x, int y,
                                          String colorHex, int iconIndex) {
-
         int colorMain = hexToArgb(colorHex);
         int colorSep = hexToArgb("#888888");
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(x, y);
-        context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE);
+        String fullText = cur + "/" + max;
+        int textWidth = client.textRenderer.getWidth(fullText);
 
-        // Иконки оригинального размера
-        NumberRenderer.drawIcon(context, iconIndex, 9, -10, 8, 8);
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(TEXT_SCALE, TEXT_SCALE, 1.0f);
+
+        // Иконка СВЕРХУ по ЦЕНТРУ
+        int iconX = (textWidth - ICON_SIZE) / 2;
+        int iconY = -ICON_SIZE - ICON_OFFSET_Y;
+        NumberRenderer.drawIcon(context, iconIndex, iconX, iconY, ICON_SIZE, ICON_SIZE);
 
         int offset = 0;
         context.drawText(client.textRenderer, cur, offset, 0, colorMain, false);
@@ -118,6 +118,6 @@ public class StatusTextScale3 {
         offset += client.textRenderer.getWidth("/");
         context.drawText(client.textRenderer, max, offset, 0, colorMain, false);
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
     }
 }

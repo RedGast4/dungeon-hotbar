@@ -1,39 +1,43 @@
 package com.dungeonhotbar.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.util.Identifier;
 
 public class NumberRenderer {
 
-    private static final Identifier ICONS = Identifier.of("dungeonhotbar", "textures/gui/icons.png");
+    private static final Identifier ICON_ARMOR = new Identifier("dungeonhotbar", "textures/gui/icon_armor.png");
+    private static final Identifier ICON_HEALTH_MOUNT = new Identifier("dungeonhotbar", "textures/gui/icon_health_mount.png");
+    private static final Identifier ICON_HUNGRY = new Identifier("dungeonhotbar", "textures/gui/icon_hungry.png");
+    private static final Identifier ICON_WATER = new Identifier("dungeonhotbar", "textures/gui/icon_water.png");
+    private static final Identifier ICON_AIR = new Identifier("dungeonhotbar", "textures/gui/icon_air.png");
 
-    // Иконки 9x9
     public static final int ICON_SIZE = 9;
 
-    /**
-     * Отрисовка иконки по индексу 0..3
-     * 1 - armor, 2 - food, 3 - water, 4 - hearth mount
-     */
     public static void drawIcon(DrawContext context, int iconIndex, int x, int y, int width, int height) {
-        int u = 0, v = 0;
+        Identifier icon = switch (iconIndex) {
+            case 0 -> ICON_AIR;
+            case 1 -> ICON_ARMOR;
+            case 2 -> ICON_HUNGRY;
+            case 3 -> ICON_WATER;
+            case 4 -> ICON_HEALTH_MOUNT;
+            default -> ICON_AIR;
+        };
 
-        switch (iconIndex) {
-            case 0 -> {u = 117; v = 140;}
-            case 1 -> { u = 69; v = 122; } // armor
-            case 2 -> { u = 103; v = 122; } // food
-            case 3 -> { u = 37; v = 131; } // water
-            case 4 -> { u = 104; v = 140; } // mount
-        }
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.enableBlend();
 
-        context.drawTexture(
-                RenderPipelines.GUI_TEXTURED,
-                ICONS,
-                x, y,        // позиция на экране
-                u, v,        // uv координаты в текстуре
-                width, height,   // размер на экране
-                512, 512,    // размер текстуры
-                0xFFFFFFFF   // цвет (белый)
-        );
+        float scaleX = (float) width / ICON_SIZE;
+        float scaleY = (float) height / ICON_SIZE;
+
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(scaleX, scaleY, 1.0f);
+        context.drawTexture(icon, 0, 0, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
+        context.getMatrices().pop();
+
+        RenderSystem.disableBlend();
     }
 }
