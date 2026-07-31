@@ -1,4 +1,4 @@
-# 🧭 Dungeon Hotbar
+ # 🧭 Dungeon Hotbar
 
 **Dungeon Hotbar** is a Fabric mod that adds a redesigned hotbar inspired by **Minecraft Dungeons**.  
 It replaces the default hotbar, giving your interface a more atmospheric and polished look — while keeping the original Minecraft style intact.
@@ -14,7 +14,7 @@ It replaces the default hotbar, giving your interface a more atmospheric and pol
 ---
 
 ## 🧩 Requirements
-- **Minecraft:** 1.21.10  
+- **Minecraft:** 1.21.1
 - **Fabric Loader:** 0.17.3  
 - **Fabric API**
 
