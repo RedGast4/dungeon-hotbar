@@ -14,7 +14,7 @@ It replaces the default hotbar, giving your interface a more atmospheric and pol
 ---
 
 ## 🧩 Requirements
-- **Minecraft:** 1.21.10  
+- **Minecraft:** 1.20.1  
 - **Fabric Loader:** 0.17.3  
 - **Fabric API**
 
