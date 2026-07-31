@@ -7,11 +7,11 @@ import net.minecraft.util.Identifier;
 
 public class NumberRenderer {
 
-    private static final Identifier ICON_ARMOR = new Identifier("dungeonhotbar", "textures/gui/icon_armor.png");
-    private static final Identifier ICON_HEALTH_MOUNT = new Identifier("dungeonhotbar", "textures/gui/icon_health_mount.png");
-    private static final Identifier ICON_HUNGRY = new Identifier("dungeonhotbar", "textures/gui/icon_hungry.png");
-    private static final Identifier ICON_WATER = new Identifier("dungeonhotbar", "textures/gui/icon_water.png");
-    private static final Identifier ICON_AIR = new Identifier("dungeonhotbar", "textures/gui/icon_air.png");
+    private static final Identifier ICON_ARMOR = Identifier.of("dungeonhotbar", "textures/gui/icon_armor.png");
+    private static final Identifier ICON_HEALTH_MOUNT = Identifier.of("dungeonhotbar", "textures/gui/icon_health_mount.png");
+    private static final Identifier ICON_HUNGRY = Identifier.of("dungeonhotbar", "textures/gui/icon_hungry.png");
+    private static final Identifier ICON_WATER = Identifier.of("dungeonhotbar", "textures/gui/icon_water.png");
+    private static final Identifier ICON_AIR = Identifier.of("dungeonhotbar", "textures/gui/icon_air.png");
 
     public static final int ICON_SIZE = 9;
 

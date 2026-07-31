@@ -14,10 +14,10 @@ import static net.minecraft.client.MinecraftClient.getInstance;
 
 public class HotbarScale4 {
 
-    private static final Identifier WIDGETS = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar.png");
-    private static final Identifier SELECTED_SLOT = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar_select.png");
-    private static final Identifier FRAME = new Identifier("dungeonhotbar", "textures/gui/dungeon_frame_health.png");
-    private static final Identifier HEARTH = new Identifier("dungeonhotbar", "textures/gui/dungeon_health.png");
+    private static final Identifier WIDGETS = Identifier.of("dungeonhotbar", "textures/gui/dungeon_hotbar.png");
+    private static final Identifier SELECTED_SLOT = Identifier.of("dungeonhotbar", "textures/gui/dungeon_hotbar_select.png");
+    private static final Identifier FRAME = Identifier.of("dungeonhotbar", "textures/gui/dungeon_frame_health.png");
+    private static final Identifier HEARTH = Identifier.of("dungeonhotbar", "textures/gui/dungeon_health.png");
 
     private static final int WIDGETS_WIDTH = 1636;
     private static final int WIDGETS_HEIGHT = 210;

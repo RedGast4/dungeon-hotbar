@@ -12,6 +12,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,10 +22,10 @@ import static net.minecraft.client.MinecraftClient.getInstance;
 
 public class HotbarRenderer {
 
-    private static final Identifier WIDGETS = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar.png");
-    private static final Identifier SELECTED_SLOT = new Identifier("dungeonhotbar", "textures/gui/dungeon_hotbar_select.png");
-    private static final Identifier FRAME = new Identifier("dungeonhotbar", "textures/gui/dungeon_frame_health.png");
-    private static final Identifier HEARTH = new Identifier("dungeonhotbar", "textures/gui/dungeon_health.png");
+    private static final Identifier WIDGETS = Identifier.of("dungeonhotbar", "textures/gui/dungeon_hotbar.png");
+    private static final Identifier SELECTED_SLOT = Identifier.of("dungeonhotbar", "textures/gui/dungeon_hotbar_select.png");
+    private static final Identifier FRAME = Identifier.of("dungeonhotbar", "textures/gui/dungeon_frame_health.png");
+    private static final Identifier HEARTH = Identifier.of("dungeonhotbar", "textures/gui/dungeon_health.png");
 
     private static final int WIDGETS_WIDTH = 1636;
     private static final int WIDGETS_HEIGHT = 210;
@@ -40,7 +41,7 @@ public class HotbarRenderer {
 
     private static float displayHealth = 20f;
 
-    public static void render(DrawContext drawContext, float tickDelta) {
+    public static void render(DrawContext drawContext, RenderTickCounter tickDelta) {
         int scale = ScaleDetector.getGuiScale();
 
         switch (scale) {
@@ -177,9 +178,10 @@ public class HotbarRenderer {
     private static int getHeartTintSurvival(MinecraftClient client) {
         if (client == null || client.player == null) return hexToArgb("#ff1313");
         var player = client.player;
-        if (player.hasStatusEffect(StatusEffects.POISON)) return hexToArgb("#8b8712");
-        if (player.hasStatusEffect(StatusEffects.WITHER)) return hexToArgb("#2b2b2b");
-        if (player.hasStatusEffect(StatusEffects.ABSORPTION)) return hexToArgb("#ffec00");
+
+        if (player.getStatusEffect(StatusEffects.POISON) != null) return hexToArgb("#8b8712");
+        if (player.getStatusEffect(StatusEffects.WITHER) != null) return hexToArgb("#2b2b2b");
+        if (player.getStatusEffect(StatusEffects.ABSORPTION) != null) return hexToArgb("#ffec00");
         if (player.isFrozen()) return hexToArgb("#80e5ef");
         return hexToArgb("#ff1313");
     }

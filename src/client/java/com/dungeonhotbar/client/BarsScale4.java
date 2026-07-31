@@ -14,10 +14,10 @@ import static com.dungeonhotbar.client.hud.HotbarRenderer.hexToArgb;
 
 public class BarsScale4 {
 
-    private static final Identifier BAR_WATER = new Identifier("dungeonhotbar", "textures/gui/progress_bar_water_air.png");
-    private static final Identifier BAR_LEVEL = new Identifier("dungeonhotbar", "textures/gui/progress_bar_enchanment.png");
-    private static final Identifier BAR_JUMP = new Identifier("dungeonhotbar", "textures/gui/progress_bar_jump_mount.png");
-    private static final Identifier BAR_EMPTY = new Identifier("dungeonhotbar", "textures/gui/progress_bar_zero_down.png");
+    private static final Identifier BAR_WATER = Identifier.of("dungeonhotbar", "textures/gui/progress_bar_water_air.png");
+    private static final Identifier BAR_LEVEL = Identifier.of("dungeonhotbar", "textures/gui/progress_bar_enchanment.png");
+    private static final Identifier BAR_JUMP = Identifier.of("dungeonhotbar", "textures/gui/progress_bar_jump_mount.png");
+    private static final Identifier BAR_EMPTY = Identifier.of("dungeonhotbar", "textures/gui/progress_bar_zero_down.png");
 
     private static final int BAR_TEX_WIDTH = 100;
     private static final int BAR_TEX_HEIGHT = 2;
@@ -68,7 +68,7 @@ public class BarsScale4 {
         if (player.hasVehicle() && player.getVehicle() instanceof LivingEntity mount) {
             float jumpRatio = 0f;
 
-            if (mount.getAttributes().hasAttribute(EntityAttributes.HORSE_JUMP_STRENGTH)) {
+            if (mount.getAttributes().hasAttribute(EntityAttributes.GENERIC_JUMP_STRENGTH)) {
                 jumpRatio = player.getMountJumpStrength();
                 if (jumpRatio > 0.99f) jumpRatio = 1.0f;
                 showJumpBar = jumpRatio > 0f;
